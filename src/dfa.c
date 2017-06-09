@@ -86,11 +86,12 @@ int attack_one_column_and_fault_in_one_row(byte * output,
   } else {
     o[1] = output[(5+(column<<2))%16];
     o[3] = output[(15+(column<<2))%16];
-    fo[1] = fault_output[(7+(column<<2))%16];
-    fo[3] = fault_output[(13+(column<<2))%16];
+    fo[1] = fault_output[(5+(column<<2))%16];
+    fo[3] = fault_output[(15+(column<<2))%16];
 
     tbl = rsbox;
   }
+
   LOOP(i, 4) {
     xor[i] = o[i] ^ fo[i];
   }
@@ -98,23 +99,26 @@ int attack_one_column_and_fault_in_one_row(byte * output,
   byte z[4],y[4];
   int counter = 0;
   LOOP(f, 0xff) { // fault value
-    /* byte f1 = (byte)f; */
-    /* byte f2 = galois_mul2(f1); */
-    /* byte f4 = galois_mul2(f2); */
-    /* byte f8 = galois_mul2(f4); */
-    /* z[fault_row] = f8 ^ f4 ^ f2; */
-    /* z[(fault_row+1)%4] = f8 ^ f1; */
-    /* z[(fault_row+2)%4] = f8 ^ f4 ^f1; */
-    /* z[(fault_row+3)%4] = f8 ^ f2 ^ f1; */
-    z[3-row] = (byte)f;
-    z[(4-row)%4] = gf_mul2_tbl[(byte)f];
-    z[(5-row)%4] = z[3-row]^z[(4-row)%4];
-    z[(6-row)%4] = z[3-row];
+    byte f1 = (byte)f;
+    byte f2 = gf_mul2_tbl[f1];
+    if (mode == ENC) {
+      z[3-row] = f1;
+      z[(4-row)%4] = f2;
+      z[(5-row)%4] = f1^f2;
+      z[(6-row)%4] = z[3-row];
+    } else {
+      byte f4 = gf_mul2_tbl[f2];
+      byte f8 = gf_mul2_tbl[f4];
+      z[row] = f8 ^ f4 ^ f2;
+      z[(row+1)%4] = f8 ^ f1;
+      z[(row+2)%4] = f8 ^ f4 ^ f1;
+      z[(row+3)%4] = f8 ^ f2 ^ f1;
+    }
 
     // for k0
     LOOP(k0, 0xff) {
       y[0] = (byte)k0;
-      if ((sbox[y[0]]^sbox[y[0]^z[0]]) == xor[0]) {
+      if ((tbl[y[0]]^tbl[y[0]^z[0]]) == xor[0]) {
 	// for k1
 	LOOP(k1, 0xff) {
 	  y[1] = (byte)k1;
@@ -141,15 +145,15 @@ int attack_one_column_and_fault_in_one_row(byte * output,
       }
     }
   }
-  return counter-1;
 
+  return counter;
 }
 
 int dfa_aes_one_column_attacking(int column,
-				  enc_mode mode,
-				  byte * output,
-				  byte valid_faults[][16],
-				  byte * last_round_key)
+				 enc_mode mode,
+				 byte * output,
+				 byte valid_faults[][16],
+				 byte * last_round_key)
 {
   unsigned int guessed_keys_1[1000] = {0};
   unsigned int guessed_keys_2[1000] = {0};
@@ -164,6 +168,7 @@ int dfa_aes_one_column_attacking(int column,
 						      valid_faults[1],
 						      column, row, mode,
 						      guessed_keys_2);
+
     if (cnt1 <= 0 || cnt2 <= 0) {
       logging(DEBUG, "fault injected for column %d is not in row %d!", column, row);
       continue;
@@ -177,9 +182,9 @@ int dfa_aes_one_column_attacking(int column,
 	  success_count += 1;
 	  // todo possible keys
 	  last_round_key[4*column] = (byte)(guessed_keys_1[i] >> 24);
-	  last_round_key[(7+4*column)%16] = (byte)((guessed_keys_1[i] >> 16) & 0xff);
+	  last_round_key[((mode == ENC?7:5)+4*column)%16] = (byte)((guessed_keys_1[i] >> 16) & 0xff);
 	  last_round_key[(10+4*column)%16] = (byte)((guessed_keys_1[i] >> 8) & 0xff);
-	  last_round_key[(13+4*column)%16] = (byte)(guessed_keys_1[i] & 0xff);
+	  last_round_key[((mode == ENC?13:15)+4*column)%16] = (byte)(guessed_keys_1[i] & 0xff);
 	}
       }
     }
