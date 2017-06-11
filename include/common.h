@@ -6,7 +6,7 @@
 #include <string.h>
 
 // set log level
-#define LOG_LEVEL DEBUG
+#define LOG_LEVEL OFF
 
 // define macros
 #define LOOP(i, v) for (int i=0; i<v; i++)
@@ -19,8 +19,6 @@
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
-
-
 
 // type definition
 typedef unsigned char byte;
@@ -38,6 +36,9 @@ static const char * log_level_string[] = {"DBUG", "INFO", "WARN", "NEWS"};
 // return -1 if the input is invalid
 int hex_to_byte(const char *, byte *, int);
 int byte_to_hex(const byte *, char *, int);
+
+// compare two bytes array with same length
+int compare_bytes_array(const byte *, const byte *, int);
 
 void logging(log_level, const char * formt, ...);
 

@@ -14,7 +14,9 @@ $(TARGET): $(OBJECTS)
 
 .PHONY: test clean
 
-%.bin: %.c
+test: $(TARGET)
+	gcc -Iinclude -L. -ldfa test/test_aes_128.c -o test_aes_128
+	./test_aes_128
 
 clean:
 	rm $(TARGET)

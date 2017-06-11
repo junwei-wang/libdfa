@@ -12,7 +12,6 @@ byte hex_char_to_byte(char c)
   return -1;
 }
 
-
 int hex_to_byte(const char * hex, byte * bytes, int len)
 {
   LOOP(i, len) {
@@ -22,6 +21,15 @@ int hex_to_byte(const char * hex, byte * bytes, int len)
     }
   }
   return 0;
+}
+
+bool compare_bytes_array(const byte * a, const byte * b, int len)
+{
+  LOOP(i, len)
+    if (a[i] != b[i])
+      return false;
+
+  return true;
 }
 
 void logging(log_level level, const char *fmt, ...)
