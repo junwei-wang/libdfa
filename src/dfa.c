@@ -193,6 +193,44 @@ int dfa_aes_one_column_attacking(int column,
   return success_count;
 }
 
+int dfa_aes128_r7(enc_mode mode,
+		  int faults_num,
+		  const char * input_hex,
+		  const char * output_hex,
+		  const char * fault_output_hex[],
+		  byte * last_round_key)
+{
+  if (mode == DEC) {
+    logging(OFF, ANSI_COLOR_YELLOW "we don't support decryption yet" ANSI_COLOR_CYAN); 
+  }
+
+  byte output[16];
+  byte valid_fault_outputs[2][16];
+  hex_to_byte(output_hex, output, 16);
+  LOOP(i, faults_num) {
+    enc_mode f_mode;
+    byte fault_output[16];
+    hex_to_byte(fault_output_hex[i], fault_output, 16);
+    memcpy(valid_fault_outputs[i], fault_output, 16);
+  }
+
+  LOOP(column,4) {
+    int cnt;
+    cnt = dfa_aes_one_column_attacking(0, mode, output, valid_fault_outputs, last_round_key);  
+    if (cnt == 1) {
+      logging(OFF, "Key guess for column %d is success!", column);
+    } else if (cnt <= 0) {
+      logging(OFF, "No key guess for column %d!", column);
+    } else {
+      logging(OFF, "Key guess for column %d is success for multiple cases! "
+	      "Please create an issue or pull request to deal with this case.", 1);
+    }
+  }
+
+
+  return 0;
+}
+
 int dfa_aes_one_column(int column,
 		       enc_mode mode,
 		       int faults_num,

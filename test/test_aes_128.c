@@ -50,6 +50,29 @@ void test_aes_128_encryption() {
   assert(compare_bytes_array(true_key_bytes, aes_key, 16) == true);
 }
 
+void test_aes128_enc_r7() {
+  byte last_round_key[16];
+
+  char * p = "00112233445566778899aabbccddeeff";
+  char * c = "69c4e0d86a7b0430d8cdb78070b4c55a";
+  const char * fc[] = {
+    "71bb25bedcf4d2a0666b527ab866692d",
+    "df32479f7ef89190262b60b6c10de9b5",
+  };
+
+  dfa_aes128_r7(ENC, sizeof(fc)/sizeof(c),
+		p, c, fc, last_round_key);
+  
+  /* byte aes_key[16]; */
+  /* reverse_aes128_key(last_round_key, aes_key, 10); */
+
+  /* char * true_key = "6a8bc7f750677a0b716697009a3fbbb0"; */
+  /* byte true_key_bytes[16] = {0}; */
+  /* hex_to_byte(true_key, true_key_bytes, 16); */
+  /* assert(compare_bytes_array(true_key_bytes, aes_key, 16) == true); */
+}
+
+
 void test_aes_128_decryption() {
   byte key[16];
 
@@ -97,6 +120,7 @@ int main(void)
 {
   test_aes_128_encryption();
   test_aes_128_decryption();
+  test_aes128_enc_r7();
   printf(ANSI_COLOR_YELLOW "All tests passed.\n" ANSI_COLOR_RESET);
   return 0;
 }
