@@ -56,20 +56,21 @@ void test_aes128_enc_r7() {
   char * p = "00112233445566778899aabbccddeeff";
   char * c = "69c4e0d86a7b0430d8cdb78070b4c55a";
   const char * fc[] = {
-    "71bb25bedcf4d2a0666b527ab866692d",
-    "df32479f7ef89190262b60b6c10de9b5",
+    "de515f7e75c74fcba62c78a0877f0f01",
+    "c329956524f05a6ca0dc7cf0c6769553",
   };
 
   dfa_aes128_r7(ENC, sizeof(fc)/sizeof(c),
 		p, c, fc, last_round_key);
   
-  /* byte aes_key[16]; */
-  /* reverse_aes128_key(last_round_key, aes_key, 10); */
+  byte aes_key[16];
+  reverse_aes128_key(last_round_key, aes_key, 10);
 
-  /* char * true_key = "6a8bc7f750677a0b716697009a3fbbb0"; */
-  /* byte true_key_bytes[16] = {0}; */
-  /* hex_to_byte(true_key, true_key_bytes, 16); */
-  /* assert(compare_bytes_array(true_key_bytes, aes_key, 16) == true); */
+  char * true_key = "000102030405060708090a0b0c0d0e0f";
+  byte true_key_bytes[16] = {0};
+  hex_to_byte(true_key, true_key_bytes, 16);
+
+  assert(compare_bytes_array(true_key_bytes, aes_key, 16) == true);
 }
 
 

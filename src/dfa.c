@@ -216,7 +216,7 @@ int dfa_aes128_r7(enc_mode mode,
 
   LOOP(column,4) {
     int cnt;
-    cnt = dfa_aes_one_column_attacking(0, mode, output, valid_fault_outputs, last_round_key);  
+    cnt = dfa_aes_one_column_attacking(column, mode, output, valid_fault_outputs, last_round_key);  
     if (cnt == 1) {
       logging(OFF, "Key guess for column %d is success!", column);
     } else if (cnt <= 0) {
