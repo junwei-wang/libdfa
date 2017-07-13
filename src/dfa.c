@@ -94,6 +94,10 @@ int attack_one_column_and_fault_in_one_row(byte * output,
 
   LOOP(i, 4) {
     xor[i] = o[i] ^ fo[i];
+    if (xor[i] == 0) {
+      printf("Not a good fault injection for column %d, row %d, continue on next column...\n", column, row);
+      return -1;
+    }
   }
 
   byte z[4],y[4];
@@ -185,6 +189,10 @@ int dfa_aes_one_column_attacking(int column,
 	  last_round_key[((mode == ENC?7:5)+4*column)%16] = (byte)((guessed_keys_1[i] >> 16) & 0xff);
 	  last_round_key[(10+4*column)%16] = (byte)((guessed_keys_1[i] >> 8) & 0xff);
 	  last_round_key[((mode == ENC?13:15)+4*column)%16] = (byte)(guessed_keys_1[i] & 0xff);
+	  printf("Possible keys each key byte:\n");
+	  printf("   %2d %2d %2d %2d\n",4*column, ((mode == ENC?7:5)+4*column)%16,(10+4*column)%16,((mode == ENC?13:15)+4*column)%16);
+	  printf("0x %02x %02x %02x %02x\n",(byte)(guessed_keys_1[i] >> 24), (byte)((guessed_keys_1[i] >> 16) & 0xff),(byte)((guessed_keys_1[i] >> 8) & 0xff),
+		 (byte)(guessed_keys_1[i] & 0xff));
 	}
       }
     }

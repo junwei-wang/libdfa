@@ -4,6 +4,7 @@
 #include "common.h"
 #include "gf.h"
 #include "aes.h"
+#include <stdlib.h>
 
 int dfa_aes_one_column(int column,
 		       enc_mode mode,
