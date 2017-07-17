@@ -162,6 +162,12 @@ int dfa_aes_one_column_attacking(int column,
   unsigned int guessed_keys_1[1000] = {0};
   unsigned int guessed_keys_2[1000] = {0};
 
+  // todo: check data in valid faults are different to each other for column
+  if( valid_faults[0][column] == valid_faults[1][column]) {
+    printf("Not a valid fault in column %d.\n", column);
+    return -1;
+  }
+
   int success_count = 0;
   LOOP(row, 4) {
     int cnt1 = attack_one_column_and_fault_in_one_row(output,
@@ -189,9 +195,9 @@ int dfa_aes_one_column_attacking(int column,
 	  last_round_key[((mode == ENC?7:5)+4*column)%16] = (byte)((guessed_keys_1[i] >> 16) & 0xff);
 	  last_round_key[(10+4*column)%16] = (byte)((guessed_keys_1[i] >> 8) & 0xff);
 	  last_round_key[((mode == ENC?13:15)+4*column)%16] = (byte)(guessed_keys_1[i] & 0xff);
-	  printf("Possible keys each key byte:\n");
+	  printf(ANSI_COLOR_CYAN "Possible keys each key byte:\n" ANSI_COLOR_MAGENTA);
 	  printf("   %2d %2d %2d %2d\n",4*column, ((mode == ENC?7:5)+4*column)%16,(10+4*column)%16,((mode == ENC?13:15)+4*column)%16);
-	  printf("0x %02x %02x %02x %02x\n",(byte)(guessed_keys_1[i] >> 24), (byte)((guessed_keys_1[i] >> 16) & 0xff),(byte)((guessed_keys_1[i] >> 8) & 0xff),
+	  printf("0x %02x %02x %02x %02x\n" ANSI_COLOR_RESET,(byte)(guessed_keys_1[i] >> 24), (byte)((guessed_keys_1[i] >> 16) & 0xff),(byte)((guessed_keys_1[i] >> 8) & 0xff),
 		 (byte)(guessed_keys_1[i] & 0xff));
 	}
       }
@@ -223,6 +229,7 @@ int dfa_aes128_r7(enc_mode mode,
   }
 
   LOOP(column,4) {
+    //    if (column!=2) continue;
     int cnt;
     cnt = dfa_aes_one_column_attacking(column, mode, output, valid_fault_outputs, last_round_key);  
     if (cnt == 1) {

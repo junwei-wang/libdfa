@@ -38,10 +38,16 @@ void logging(log_level level, const char *fmt, ...)
     return;
   }
 
+  if (level == OFF) {
+    printf(ANSI_COLOR_RED);
+  }
+
   printf("[%s] ", log_level_string[level]);
   va_list args;
   va_start(args, fmt);
   vprintf(fmt, args);
   va_end(args);
   printf("\n");
+
+  printf(ANSI_COLOR_RESET);
 }
